@@ -12,10 +12,12 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Tentativa de login iniciada:', { username });
     setLoading(true);
     setError('');
 
     try {
+      console.log('Enviando requisição para /api/auth/login...');
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
