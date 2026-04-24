@@ -24,12 +24,18 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password }),
       });
 
+      console.log('Resposta recebida do servidor. Status:', res.status);
+
       if (res.ok) {
-        router.push('/admin');
+        console.log('Login OK! Redirecionando para /admin...');
+        window.location.href = '/admin'; // Usando window.location para forçar o reload e redirecionamento
       } else {
+        const data = await res.json();
+        console.error('Falha no login:', data.message);
         setError('Usuário ou senha incorretos.');
       }
     } catch (err) {
+      console.error('Erro na conexão com a API:', err);
       setError('Erro ao conectar com o servidor.');
     } finally {
       setLoading(false);

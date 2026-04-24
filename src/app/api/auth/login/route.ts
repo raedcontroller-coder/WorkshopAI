@@ -3,9 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   try {
     const { username, password } = await req.json();
+    console.log(`[API Login] Tentativa de acesso para o usuário: ${username}`);
 
     const validUser = process.env.ADMIN_USER;
     const validPassword = process.env.ADMIN_PASSWORD;
+
+    console.log(`[API Login] Comparando com envs: USER=${validUser}, PASS=${validPassword ? '****' : 'UNDEFINED'}`);
 
     if (username === validUser && password === validPassword) {
       const response = NextResponse.json({ success: true });
