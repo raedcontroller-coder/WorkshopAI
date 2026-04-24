@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       // Cookie de sessão simples (expira em 24h)
       response.cookies.set('ianeg_admin_session', 'true', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // Permitir em HTTP para testes no sslip.io
         sameSite: 'lax',
         maxAge: 60 * 60 * 24,
         path: '/',
