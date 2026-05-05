@@ -16,10 +16,10 @@ export default function AdminDashboard() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
   const [form, setForm] = useState({ name: '', theme: '', techs: '', members: '' });
-  
-  // Estados para o QR Code
   const [showQR, setShowQR] = useState(false);
   const [qrGroup, setQrGroup] = useState<Group | null>(null);
+  const [sortBy, setSortBy] = useState<'name' | 'votes'>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     fetchGroups();
@@ -32,6 +32,29 @@ export default function AdminDashboard() {
       setGroups(data);
     } catch (error) {
       console.error('Erro ao buscar grupos:', error);
+    }
+  };
+
+  const getSortedGroups = () => {
+    return [...groups].sort((a, b) => {
+      if (sortBy === 'name') {
+        const numA = parseInt(a.name.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b.name.replace(/\D/g, '')) || 0;
+        return sortOrder === 'asc' ? numA - numB : numB - numA;
+      } else {
+        const votesA = a.voteCount || 0;
+        const votesB = b.voteCount || 0;
+        return sortOrder === 'asc' ? votesA - votesB : votesB - votesA;
+      }
+    });
+  };
+
+  const toggleSort = (criterion: 'name' | 'votes') => {
+    if (sortBy === criterion) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(criterion);
+      setSortOrder(criterion === 'votes' ? 'desc' : 'asc'); // Votos geralmente queremos ver o maior primeiro
     }
   };
 
@@ -89,6 +112,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleResetVotes = async () => {
+    const confirm1 = confirm('ATENÇÃO: Você está prestes a apagar TODOS os votos do sistema. Esta ação não pode ser desfeita. Deseja continuar?');
+    if (!confirm1) return;
+
+    const confirm2 = confirm('CONFIRMAÇÃO FINAL: Tem certeza absoluta que deseja ZERAR o banco de votos para recomeçar?');
+    if (!confirm2) return;
+
+    try {
+      const res = await fetch('/api/admin/votes/reset', { method: 'POST' });
+      if (res.ok) {
+        alert('O banco de votos foi zerado com sucesso!');
+        fetchGroups(); // Atualiza o ranking
+      } else {
+        alert('Erro ao zerar votos.');
+      }
+    } catch (error) {
+      alert('Erro de conexão com o mainframe.');
+    }
+  };
+
+  const sortedGroups = getSortedGroups();
+
   return (
     <div className="container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
@@ -96,7 +141,25 @@ export default function AdminDashboard() {
           <h1 style={{ fontSize: '2rem', color: 'var(--primary)' }}>Gestão do Workshop</h1>
           <p style={{ color: 'var(--secondary)' }}>Administre grupos, IAs e resultados</p>
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button 
+            onClick={handleResetVotes}
+            style={{
+              padding: '0.6rem 1.2rem',
+              borderRadius: 'var(--radius)',
+              background: 'var(--danger)',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              fontSize: '0.85rem',
+              boxShadow: '0 0 15px rgba(255, 0, 0, 0.3)',
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
+            }}
+          >
+            ⚠️ Zerar Todos os Votos
+          </button>
           <button 
             onClick={() => {
               setEditingGroup(null);
@@ -120,7 +183,7 @@ export default function AdminDashboard() {
               await fetch('/api/auth/logout', { method: 'POST' });
               window.location.href = '/login';
             }}
-            style={{ padding: '0.6rem 1.2rem', borderRadius: 'var(--radius)', border: '1px solid var(--danger)', background: 'transparent', color: 'var(--danger)', cursor: 'pointer' }}
+            style={{ padding: '0.6rem 1.2rem', borderRadius: 'var(--radius)', border: '1px solid var(--card-border)', background: 'transparent', color: 'var(--secondary)', cursor: 'pointer' }}
           >
             Sair
           </button>
@@ -164,15 +227,25 @@ export default function AdminDashboard() {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid var(--card-border)' }}>
-                <th style={{ padding: '1rem' }}>Grupo / Tema</th>
+                <th 
+                  onClick={() => toggleSort('name')}
+                  style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none' }}
+                >
+                  Grupo / Tema {sortBy === 'name' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                </th>
                 <th style={{ padding: '1rem' }}>Integrantes</th>
                 <th style={{ padding: '1rem' }}>IAs</th>
-                <th style={{ padding: '1rem', textAlign: 'center' }}>Votos</th>
+                <th 
+                  onClick={() => toggleSort('votes')}
+                  style={{ padding: '1rem', textAlign: 'center', cursor: 'pointer', userSelect: 'none' }}
+                >
+                  Votos {sortBy === 'votes' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                </th>
                 <th style={{ padding: '1rem', textAlign: 'right' }}>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {groups.map((group) => (
+              {sortedGroups.map((group) => (
                 <tr key={group.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', verticalAlign: 'top' }}>
                   <td style={{ padding: '1rem' }}>
                     <div style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{group.name}</div>

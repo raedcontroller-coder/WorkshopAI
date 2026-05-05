@@ -1,22 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Colors - Tactical Dark Theme */
-  --background: #0a0c10;
+  /* Cyberpunk Palette */
+  --background: #020205;
   --foreground: #f0f2f5;
-  --card-bg: rgba(22, 27, 34, 0.7);
-  --card-border: rgba(48, 54, 61, 0.8);
   --primary: #00ffcc; /* Neon Cyan */
-  --primary-glow: rgba(0, 255, 204, 0.3);
-  --secondary: #7d8590;
-  --accent: #238636;
-  --danger: #f85149;
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-blur: 12px;
-  
-  /* Spacing */
-  --radius: 12px;
-  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+  --secondary: #ff00ff; /* Neon Magenta */
+  --accent: #ffff00; /* Acid Yellow */
+  --card-bg: rgba(10, 12, 16, 0.85);
+  --card-border: rgba(0, 255, 204, 0.4);
+  --radius: 4px;
+  --shadow: 0 0 20px rgba(0, 255, 204, 0.15);
 }
 
 * {
@@ -29,48 +23,110 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  background: var(--background);
+  background-color: var(--background);
+  /* Scanlines and Dark Gradient */
+  background-image: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03)),
+    radial-gradient(circle at 50% 50%, #0d0d1a 0%, #020205 100%);
+  background-size: 100% 4px, 3px 100%, 100% 100%;
   color: var(--foreground);
   font-family: 'Inter', sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-body {
-  background-image: 
-    radial-gradient(circle at 20% 20%, rgba(0, 255, 204, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(125, 133, 144, 0.05) 0%, transparent 40%);
   min-height: 100vh;
 }
 
+/* Background Grid Overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: 
+    linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: -1;
+}
+
 h1, h2, h3 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   font-weight: 700;
-  letter-spacing: -0.02em;
 }
 
-/* Glassmorphism Utility */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+/* Cyber Card Styling */
+.cyber-card {
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  /* Beveled corner effect */
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
   box-shadow: var(--shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Animations */
-@keyframes pulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 var(--primary-glow); }
-  70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(0, 255, 204, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 204, 0); }
+.cyber-card:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
+  transform: translateY(-4px) scale(1.01);
 }
 
-.animate-pulse-glow {
-  animation: pulse 2s infinite;
+.cyber-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 4px;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
+
+/* Glitch Heading */
+.glitch-text {
+  position: relative;
+  color: var(--primary);
+  text-shadow: 2px 2px var(--secondary);
+}
+
+/* Cyber Button */
+.cyber-button {
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 12px 24px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+}
+
+.cyber-button:hover:not(:disabled) {
+  background: var(--primary);
+  color: #000;
+  box-shadow: 0 0 20px var(--primary);
+}
+
+.cyber-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--secondary);
+  color: var(--secondary);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -78,10 +134,46 @@ h1, h2, h3 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--card-border);
-  border-radius: 10px;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--secondary);
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+  body {
+    background-size: 100% 3px, 2px 100%, 100% 100%; /* Scanlines mais finas no mobile */
+  }
+
+  main {
+    padding: 2rem 1rem !important;
+  }
+
+  h1 {
+    font-size: 2rem !important;
+  }
+
+  .glitch-text {
+    letter-spacing: 1px;
+  }
+
+  .cyber-card {
+    padding: 1.5rem !important;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+  }
+
+  .cyber-card h3 {
+    font-size: 1.2rem !important;
+  }
+
+  .cyber-button {
+    padding: 10px 16px;
+    font-size: 0.8rem;
+  }
+
+  footer {
+    margin-top: 3rem !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 2px !important;
+  }
 }
+
