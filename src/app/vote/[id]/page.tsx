@@ -19,6 +19,7 @@ export default function VotePage() {
   const [voting, setVoting] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
   const [error, setError] = useState('');
+  const [comment, setComment] = useState('');
 
   useEffect(() => {
     if (localStorage.getItem('ianeg_voted')) {
@@ -51,7 +52,10 @@ export default function VotePage() {
       const res = await fetch('/api/vote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ groupId: id }),
+        body: JSON.stringify({ 
+          groupId: id,
+          comment: comment.trim() || null
+        }),
       });
 
       if (res.ok) {
@@ -107,16 +111,37 @@ export default function VotePage() {
             </div>
           </div>
 
-          <div style={{ textAlign: 'left', marginBottom: '3rem' }}>
-            <h3 style={{ fontSize: '0.8rem', color: 'var(--secondary)', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Tecnologias</h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-              {group.technologies.map(t => (
-                <span key={t.name} style={{ border: '1px solid rgba(255, 0, 255, 0.3)', color: 'var(--secondary)', padding: '0.2rem 0.6rem', fontSize: '0.75rem' }}>
-                  {t.name}
-                </span>
-              ))}
+          {!hasVoted && (
+            <div style={{ textAlign: 'left', marginBottom: '2rem' }}>
+              <label style={{ 
+                display: 'block', 
+                fontSize: '0.7rem', 
+                color: 'var(--secondary)', 
+                marginBottom: '0.5rem',
+                textTransform: 'uppercase',
+                letterSpacing: '1px'
+              }}>
+                Comentário Opcional
+              </label>
+              <textarea 
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Deixe uma mensagem para este grupo..."
+                style={{
+                  width: '100%',
+                  height: '80px',
+                  background: 'rgba(0,0,0,0.3)',
+                  border: '1px solid var(--card-border)',
+                  color: 'var(--foreground)',
+                  padding: '0.8rem',
+                  fontFamily: 'inherit',
+                  outline: 'none',
+                  resize: 'none',
+                  fontSize: '0.9rem'
+                }}
+              />
             </div>
-          </div>
+          )}
 
           <button 
             onClick={handleVote}
