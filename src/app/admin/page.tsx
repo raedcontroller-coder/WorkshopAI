@@ -9,6 +9,7 @@ interface Group {
   members: string[];
   technologies: { name: string }[];
   voteCount?: number;
+  comments?: { text: string; date: string }[];
 }
 
 export default function AdminDashboard() {
@@ -18,6 +19,8 @@ export default function AdminDashboard() {
   const [form, setForm] = useState({ name: '', theme: '', techs: '', members: '' });
   const [showQR, setShowQR] = useState(false);
   const [qrGroup, setQrGroup] = useState<Group | null>(null);
+  const [showComments, setShowComments] = useState(false);
+  const [commentGroup, setCommentGroup] = useState<Group | null>(null);
   const [sortBy, setSortBy] = useState<'name' | 'votes'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
@@ -29,7 +32,12 @@ export default function AdminDashboard() {
     try {
       const response = await fetch('/api/ranking');
       const data = await response.json();
-      setGroups(data);
+      if (Array.isArray(data)) {
+        setGroups(data);
+      } else {
+        console.error('Dados de ranking inválidos:', data);
+        setGroups([]);
+      }
     } catch (error) {
       console.error('Erro ao buscar grupos:', error);
     }
@@ -269,6 +277,7 @@ export default function AdminDashboard() {
                     </td>
                     <td style={{ padding: '1rem', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                        <button onClick={() => { setCommentGroup(group); setShowComments(true); }} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--secondary)', color: 'var(--secondary)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem' }}>Comentários ({group.comments?.length || 0})</button>
                         <button onClick={() => { setQrGroup(group); setShowQR(true); }} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--primary)', color: 'var(--primary)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem' }}>QR Code</button>
                         <button onClick={() => handleEdit(group)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--accent)', color: 'var(--accent)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem' }}>Editar</button>
                         <button onClick={() => handleDelete(group.id)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--danger)', color: 'var(--danger)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem' }}>Excluir</button>
@@ -351,6 +360,52 @@ export default function AdminDashboard() {
             </div>
           </div>
         </>
+      )}
+
+      {showComments && commentGroup && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem' }}>
+          <div className="glass" style={{ padding: '2rem', width: '100%', maxWidth: '600px', borderRadius: 'var(--radius)', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+              <h2 style={{ color: 'var(--primary)', margin: 0 }}>Comentários: {commentGroup.name}</h2>
+              <button 
+                onClick={() => setShowComments(false)} 
+                style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}
+              >
+                &times;
+              </button>
+            </div>
+            
+            <div style={{ overflowY: 'auto', flex: 1, paddingRight: '1rem' }}>
+              {commentGroup.comments && commentGroup.comments.length > 0 ? (
+                commentGroup.comments.map((comment, i) => (
+                  <div key={i} style={{ 
+                    padding: '1rem', 
+                    background: 'rgba(255,255,255,0.05)', 
+                    borderRadius: '8px', 
+                    marginBottom: '1rem',
+                    borderLeft: '3px solid var(--secondary)'
+                  }}>
+                    <p style={{ margin: '0 0 0.5rem 0', lineHeight: '1.5' }}>"{comment.text}"</p>
+                    <small style={{ color: 'var(--secondary)', opacity: 0.7 }}>
+                      {new Date(comment.date).toLocaleString('pt-BR')}
+                    </small>
+                  </div>
+                ))
+              ) : (
+                <p style={{ textAlign: 'center', opacity: 0.5, marginTop: '2rem' }}>Nenhum comentário registrado para este grupo.</p>
+              )}
+            </div>
+
+            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+              <button 
+                onClick={() => setShowComments(false)} 
+                style={{ padding: '0.8rem 2rem', background: 'var(--primary)', color: '#000', border: 'none', borderRadius: 'var(--radius)', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <style jsx>{`

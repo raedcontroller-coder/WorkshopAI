@@ -8,6 +8,13 @@ export async function GET() {
         technologies: {
           select: { name: true }
         },
+        votes: {
+          select: { comment: true, timestamp: true },
+          where: { 
+            comment: { not: null, not: '' } 
+          },
+          orderBy: { timestamp: 'desc' }
+        },
         _count: {
           select: { votes: true },
         },
@@ -31,10 +38,12 @@ export async function GET() {
       members: g.members,
       technologies: g.technologies,
       voteCount: g._count.votes,
+      comments: g.votes.map(v => ({ text: v.comment, date: v.timestamp })),
     }));
 
     return NextResponse.json(formattedRanking);
   } catch (error) {
+    console.error('Erro detalhado no ranking:', error);
     return NextResponse.json({ message: 'Erro ao buscar ranking' }, { status: 500 });
   }
 }

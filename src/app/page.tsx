@@ -14,6 +14,8 @@ export default function VotingPage() {
   const [loading, setLoading] = useState(true);
   const [voted, setVoted] = useState(false);
   const [votingId, setVotingId] = useState<string | null>(null);
+  const [comment, setComment] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
   useEffect(() => {
     const hasVoted = localStorage.getItem('ianeg_voted');
@@ -49,20 +51,24 @@ export default function VotingPage() {
     }
   };
 
-  const handleVote = async (groupId: string) => {
-    if (voted) return;
-    setVotingId(groupId);
+  const handleVote = async () => {
+    if (voted || !selectedGroup) return;
+    setVotingId(selectedGroup.id);
     
     try {
       const response = await fetch('/api/vote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ groupId }),
+        body: JSON.stringify({ 
+          groupId: selectedGroup.id,
+          comment: comment.trim() || null
+        }),
       });
 
       if (response.ok) {
         localStorage.setItem('ianeg_voted', 'true');
         setVoted(true);
+        setSelectedGroup(null);
       } else {
         const error = await response.json();
         alert(error.message || 'Erro ao votar.');
@@ -154,7 +160,7 @@ export default function VotingPage() {
                   </div>
                   
                   <button 
-                    onClick={() => handleVote(group.id)}
+                    onClick={() => setSelectedGroup(group)}
                     disabled={votingId !== null}
                     className="cyber-button"
                     style={{ width: '100%' }}
@@ -164,6 +170,86 @@ export default function VotingPage() {
                 </article>
               ))
             )}
+          </div>
+        )}
+
+        {/* Modal de Comentário */}
+        {selectedGroup && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem'
+          }}>
+            <div className="cyber-card" style={{ 
+              width: '100%', 
+              maxWidth: '500px', 
+              padding: '2rem',
+              position: 'relative'
+            }}>
+              <h3 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>
+                CONFIGURAÇÃO DE VOTO
+              </h3>
+              <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--foreground)' }}>
+                Você está votando no grupo: <strong style={{ color: 'var(--secondary)' }}>{selectedGroup.name}</strong>
+              </p>
+              
+              <div style={{ marginBottom: '2rem' }}>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.7rem', 
+                  color: 'var(--primary)', 
+                  marginBottom: '0.5rem',
+                  letterSpacing: '2px'
+                }}>
+                  COMENTÁRIO ADICIONAL (OPCIONAL)
+                </label>
+                <textarea 
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Deixe uma mensagem para o grupo..."
+                  style={{
+                    width: '100%',
+                    height: '120px',
+                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid var(--card-border)',
+                    color: 'var(--foreground)',
+                    padding: '1rem',
+                    fontFamily: 'inherit',
+                    outline: 'none',
+                    resize: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <button 
+                  onClick={() => setSelectedGroup(null)}
+                  className="cyber-button"
+                  style={{ 
+                    background: 'transparent', 
+                    color: 'var(--foreground)',
+                    border: '1px solid var(--card-border)'
+                  }}
+                >
+                  CANCELAR
+                </button>
+                <button 
+                  onClick={handleVote}
+                  disabled={votingId !== null}
+                  className="cyber-button"
+                >
+                  {votingId ? 'ENVIANDO...' : 'CONFIRMAR'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

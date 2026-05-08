@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
   try {
-    const { groupId } = await req.json();
+    const { groupId, comment } = await req.json();
 
     if (!groupId) {
       return NextResponse.json({ message: 'Grupo não especificado' }, { status: 400 });
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
     await prisma.vote.create({
       data: {
         groupId,
+        comment,
         ipAddress: ip.split(',')[0],
         userAgent,
       },

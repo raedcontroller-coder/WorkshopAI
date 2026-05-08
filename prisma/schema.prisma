@@ -37,6 +37,7 @@ model Vote {
   fingerprint String? // Extra protection (e.g., persistent cookie ID)
   groupId   String
   group     Group    @relation(fields: [groupId], references: [id])
+  comment   String?  // Novo campo opcional
   timestamp DateTime @default(now())
 
   @@index([ipAddress, userAgent])
