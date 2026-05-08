@@ -135,172 +135,222 @@ export default function AdminDashboard() {
   const sortedGroups = getSortedGroups();
 
   return (
-    <div className="container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-        <div>
-          <h1 style={{ fontSize: '2rem', color: 'var(--primary)' }}>Gestão do Workshop</h1>
-          <p style={{ color: 'var(--secondary)' }}>Administre grupos, IAs e resultados</p>
-        </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <button 
-            onClick={handleResetVotes}
-            style={{
-              padding: '0.6rem 1.2rem',
-              borderRadius: 'var(--radius)',
-              background: 'var(--danger)',
-              color: '#fff',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              fontSize: '0.85rem',
-              boxShadow: '0 0 15px rgba(255, 0, 0, 0.3)',
-              textTransform: 'uppercase',
-              letterSpacing: '1px'
-            }}
-          >
-            ⚠️ Zerar Todos os Votos
-          </button>
-          <button 
-            onClick={() => {
-              setEditingGroup(null);
-              setForm({ name: '', theme: '', techs: '', members: '' });
-              setIsEditing(!isEditing);
-            }}
-            style={{
-              padding: '0.6rem 1.2rem',
-              borderRadius: 'var(--radius)',
-              background: isEditing ? 'transparent' : 'var(--primary)',
-              color: isEditing ? 'var(--primary)' : '#000',
-              border: isEditing ? '1px solid var(--primary)' : 'none',
-              cursor: 'pointer',
-              fontWeight: '600'
-            }}
-          >
-            {isEditing ? 'Cancelar' : '+ Novo Grupo'}
-          </button>
-          <button 
-            onClick={async () => {
-              await fetch('/api/auth/logout', { method: 'POST' });
-              window.location.href = '/login';
-            }}
-            style={{ padding: '0.6rem 1.2rem', borderRadius: 'var(--radius)', border: '1px solid var(--card-border)', background: 'transparent', color: 'var(--secondary)', cursor: 'pointer' }}
-          >
-            Sair
-          </button>
-        </div>
-      </header>
+    <>
+      <div className="container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+          <div>
+            <h1 style={{ fontSize: '2rem', color: 'var(--primary)' }}>Gestão do Workshop</h1>
+            <p style={{ color: 'var(--secondary)' }}>Administre grupos, IAs e resultados</p>
+          </div>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <button 
+              onClick={handleResetVotes}
+              style={{
+                padding: '0.6rem 1.2rem',
+                borderRadius: 'var(--radius)',
+                background: 'var(--danger)',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: '0.85rem',
+                boxShadow: '0 0 15px rgba(255, 0, 0, 0.3)',
+                textTransform: 'uppercase',
+                letterSpacing: '1px'
+              }}
+            >
+              ⚠️ Zerar Todos os Votos
+            </button>
+            <button 
+              onClick={() => {
+                setEditingGroup(null);
+                setForm({ name: '', theme: '', techs: '', members: '' });
+                setIsEditing(!isEditing);
+              }}
+              style={{
+                padding: '0.6rem 1.2rem',
+                borderRadius: 'var(--radius)',
+                background: isEditing ? 'transparent' : 'var(--primary)',
+                color: isEditing ? 'var(--primary)' : '#000',
+                border: isEditing ? '1px solid var(--primary)' : 'none',
+                cursor: 'pointer',
+                fontWeight: '600'
+              }}
+            >
+              {isEditing ? 'Cancelar' : '+ Novo Grupo'}
+            </button>
+            <button 
+              onClick={async () => {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/login';
+              }}
+              style={{ padding: '0.6rem 1.2rem', borderRadius: 'var(--radius)', border: '1px solid var(--card-border)', background: 'transparent', color: 'var(--secondary)', cursor: 'pointer' }}
+            >
+              Sair
+            </button>
+          </div>
+        </header>
 
-      {isEditing && (
-        <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius)', marginBottom: '3rem', border: '1px solid var(--primary)' }}>
-          <h2 style={{ marginBottom: '1.5rem', fontSize: '1.2rem' }}>
-            {editingGroup ? `Editando: ${editingGroup.name}` : 'Cadastrar Novo Grupo'}
-          </h2>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              <label>Nome do Grupo
-                <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required className="admin-input" />
-              </label>
-              <label>Tema do Projeto
-                <input type="text" value={form.theme} onChange={e => setForm({...form, theme: e.target.value})} required className="admin-input" />
-              </label>
-            </div>
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              <label>IAs Utilizadas (virgula)
-                <input type="text" value={form.techs} onChange={e => setForm({...form, techs: e.target.value})} placeholder="Claude, ChatGPT, Midjourney" className="admin-input" />
-              </label>
-              <label>Integrantes (virgula)
-                <input type="text" value={form.members} onChange={e => setForm({...form, members: e.target.value})} placeholder="João Silva, Maria Souza" className="admin-input" />
-              </label>
-            </div>
-            <div style={{ gridColumn: 'span 2', textAlign: 'right' }}>
-              <button type="submit" style={{ padding: '0.8rem 2rem', background: 'var(--primary)', color: '#000', border: 'none', borderRadius: 'var(--radius)', fontWeight: 'bold', cursor: 'pointer' }}>
-                {editingGroup ? 'Atualizar Dados' : 'Criar Grupo'}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+        {isEditing && (
+          <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius)', marginBottom: '3rem', border: '1px solid var(--primary)' }}>
+            <h2 style={{ marginBottom: '1.5rem', fontSize: '1.2rem' }}>
+              {editingGroup ? `Editando: ${editingGroup.name}` : 'Cadastrar Novo Grupo'}
+            </h2>
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                <label>Nome do Grupo
+                  <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required className="admin-input" />
+                </label>
+                <label>Tema do Projeto
+                  <input type="text" value={form.theme} onChange={e => setForm({...form, theme: e.target.value})} required className="admin-input" />
+                </label>
+              </div>
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                <label>IAs Utilizadas (virgula)
+                  <input type="text" value={form.techs} onChange={e => setForm({...form, techs: e.target.value})} placeholder="Claude, ChatGPT, Midjourney" className="admin-input" />
+                </label>
+                <label>Integrantes (virgula)
+                  <input type="text" value={form.members} onChange={e => setForm({...form, members: e.target.value})} placeholder="João Silva, Maria Souza" className="admin-input" />
+                </label>
+              </div>
+              <div style={{ gridColumn: 'span 2', textAlign: 'right' }}>
+                <button type="submit" style={{ padding: '0.8rem 2rem', background: 'var(--primary)', color: '#000', border: 'none', borderRadius: 'var(--radius)', fontWeight: 'bold', cursor: 'pointer' }}>
+                  {editingGroup ? 'Atualizar Dados' : 'Criar Grupo'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
-      <div className="ranking-section">
-        <h2 style={{ marginBottom: '1.5rem' }}>Grupos e Ranking</h2>
-        <div className="glass" style={{ borderRadius: 'var(--radius)', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid var(--card-border)' }}>
-                <th 
-                  onClick={() => toggleSort('name')}
-                  style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none' }}
-                >
-                  Grupo / Tema {sortBy === 'name' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
-                </th>
-                <th style={{ padding: '1rem' }}>Integrantes</th>
-                <th style={{ padding: '1rem' }}>IAs</th>
-                <th 
-                  onClick={() => toggleSort('votes')}
-                  style={{ padding: '1rem', textAlign: 'center', cursor: 'pointer', userSelect: 'none' }}
-                >
-                  Votos {sortBy === 'votes' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
-                </th>
-                <th style={{ padding: '1rem', textAlign: 'right' }}>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedGroups.map((group) => (
-                <tr key={group.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', verticalAlign: 'top' }}>
-                  <td style={{ padding: '1rem' }}>
-                    <div style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{group.name}</div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--secondary)' }}>{group.theme}</div>
-                  </td>
-                  <td style={{ padding: '1rem', fontSize: '0.85rem' }}>
-                    {group.members.length > 0 ? group.members.join(', ') : <span style={{ opacity: 0.3 }}>Nenhum</span>}
-                  </td>
-                  <td style={{ padding: '1rem' }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {group.technologies.map(t => (
-                        <span key={t.name} style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(0,243,255,0.1)', color: 'var(--primary)', border: '1px solid rgba(0,243,255,0.2)' }}>
-                          {t.name}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td style={{ padding: '1rem', textAlign: 'center', fontWeight: 'bold' }}>
-                    {group.voteCount || 0}
-                  </td>
-                  <td style={{ padding: '1rem', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                      <button onClick={() => { setQrGroup(group); setShowQR(true); }} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--primary)', color: 'var(--primary)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem' }}>QR Code</button>
-                      <button onClick={() => handleEdit(group)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--accent)', color: 'var(--accent)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem' }}>Editar</button>
-                      <button onClick={() => handleDelete(group.id)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--danger)', color: 'var(--danger)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem' }}>Excluir</button>
-                    </div>
-                  </td>
+        <div className="ranking-section">
+          <h2 style={{ marginBottom: '1.5rem' }}>Grupos e Ranking</h2>
+          <div className="glass" style={{ borderRadius: 'var(--radius)', overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid var(--card-border)' }}>
+                  <th 
+                    onClick={() => toggleSort('name')}
+                    style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none' }}
+                  >
+                    Grupo / Tema {sortBy === 'name' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                  </th>
+                  <th style={{ padding: '1rem' }}>Integrantes</th>
+                  <th style={{ padding: '1rem' }}>IAs</th>
+                  <th 
+                    onClick={() => toggleSort('votes')}
+                    style={{ padding: '1rem', textAlign: 'center', cursor: 'pointer', userSelect: 'none' }}
+                  >
+                    Votos {sortBy === 'votes' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                  </th>
+                  <th style={{ padding: '1rem', textAlign: 'right' }}>Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sortedGroups.map((group) => (
+                  <tr key={group.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', verticalAlign: 'top' }}>
+                    <td style={{ padding: '1rem' }}>
+                      <div style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{group.name}</div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--secondary)' }}>{group.theme}</div>
+                    </td>
+                    <td style={{ padding: '1rem', fontSize: '0.85rem' }}>
+                      {group.members.length > 0 ? group.members.join(', ') : <span style={{ opacity: 0.3 }}>Nenhum</span>}
+                    </td>
+                    <td style={{ padding: '1rem' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                        {group.technologies.map(t => (
+                          <span key={t.name} style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(0,243,255,0.1)', color: 'var(--primary)', border: '1px solid rgba(0,243,255,0.2)' }}>
+                            {t.name}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td style={{ padding: '1rem', textAlign: 'center', fontWeight: 'bold' }}>
+                      {group.voteCount || 0}
+                    </td>
+                    <td style={{ padding: '1rem', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                        <button onClick={() => { setQrGroup(group); setShowQR(true); }} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--primary)', color: 'var(--primary)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem' }}>QR Code</button>
+                        <button onClick={() => handleEdit(group)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--accent)', color: 'var(--accent)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem' }}>Editar</button>
+                        <button onClick={() => handleDelete(group.id)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--danger)', color: 'var(--danger)', background: 'transparent', cursor: 'pointer', fontSize: '0.8rem' }}>Excluir</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       {showQR && qrGroup && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem' }}>
-          <div className="glass" style={{ padding: '3rem', textAlign: 'center', maxWidth: '400px', borderRadius: 'var(--radius)' }}>
-            <h2 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>Votação: {qrGroup.name}</h2>
-            <p style={{ color: 'var(--secondary)', marginBottom: '2rem', fontSize: '0.9rem' }}>Aponte a câmera para votar neste grupo</p>
-            
-            <div style={{ background: '#fff', padding: '1rem', borderRadius: '10px', display: 'inline-block' }}>
-              <img 
-                src={`https://quickchart.io/qr?text=${encodeURIComponent(window.location.origin + '/vote/' + qrGroup.id)}&size=300`} 
-                alt="QR Code" 
-                style={{ display: 'block' }}
-              />
-            </div>
+        <>
+          {/* Modal Visível na Tela */}
+          <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem' }}>
+            <div className="glass" style={{ padding: '3rem', textAlign: 'center', maxWidth: '400px', borderRadius: 'var(--radius)' }}>
+              <h2 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>Votação: {qrGroup.name}</h2>
+              <p style={{ color: 'var(--secondary)', marginBottom: '2rem', fontSize: '0.9rem' }}>Aponte a câmera para votar neste grupo</p>
+              
+              <div style={{ background: '#fff', padding: '1rem', borderRadius: '10px', display: 'inline-block' }}>
+                <img 
+                  src={`https://quickchart.io/qr?text=${encodeURIComponent(window.location.origin + '/vote/' + qrGroup.id)}&size=300`} 
+                  alt="QR Code" 
+                  style={{ display: 'block' }}
+                />
+              </div>
 
-            <div style={{ marginTop: '2rem' }}>
-              <button onClick={() => setShowQR(false)} style={{ padding: '0.8rem 2rem', background: 'var(--primary)', color: '#000', border: 'none', borderRadius: 'var(--radius)', fontWeight: 'bold', cursor: 'pointer' }}>
-                Fechar
-              </button>
+              <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <button 
+                  onClick={() => window.print()} 
+                  style={{ padding: '0.8rem 1.5rem', background: 'var(--secondary)', color: '#fff', border: 'none', borderRadius: 'var(--radius)', fontWeight: 'bold', cursor: 'pointer' }}
+                >
+                  🖨️ Imprimir
+                </button>
+                <button 
+                  onClick={() => setShowQR(false)} 
+                  style={{ padding: '0.8rem 1.5rem', background: 'var(--primary)', color: '#000', border: 'none', borderRadius: 'var(--radius)', fontWeight: 'bold', cursor: 'pointer' }}
+                >
+                  Fechar
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+
+          {/* Área Oculta Apenas para Impressão */}
+          <div id="print-area">
+            <div style={{ 
+              textAlign: 'center', 
+              fontFamily: 'sans-serif', 
+              padding: '2cm',
+              height: '297mm',
+              width: '210mm',
+              margin: '0 auto',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#000',
+              background: '#fff'
+            }}>
+              <h1 style={{ fontSize: '64px', marginBottom: '10px', textTransform: 'uppercase', fontWeight: 'bold' }}>{qrGroup.name}</h1>
+              <h2 style={{ fontSize: '32px', color: '#333', marginBottom: '60px', letterSpacing: '2px' }}>VOTE EM NOSSO PROJETO!</h2>
+              
+              <div style={{ border: '2px solid #000', padding: '1.5rem', borderRadius: '20px' }}>
+                <img 
+                  src={`https://quickchart.io/qr?text=${encodeURIComponent(window.location.origin + '/vote/' + qrGroup.id)}&size=600`} 
+                  alt="QR Code" 
+                  style={{ width: '14cm', height: '14cm', display: 'block' }}
+                />
+              </div>
+
+              <p style={{ fontSize: '24px', marginTop: '60px', fontWeight: '500' }}>Aponte a câmera para votar neste grupo</p>
+              
+              <div style={{ marginTop: '40px', textAlign: 'center' }}>
+                <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#000' }}>WORKSHOP DE IA PARA NEGÓCIOS</div>
+                <div style={{ fontSize: '18px', color: '#333' }}>FECAP</div>
+              </div>
+            </div>
+          </div>
+        </>
       )}
 
       <style jsx>{`
@@ -323,7 +373,36 @@ export default function AdminDashboard() {
           text-transform: uppercase;
           letter-spacing: 1px;
         }
+
+        #print-area {
+          display: none;
+        }
+
+        @media print {
+          body {
+            background: white !important;
+            margin: 0;
+            padding: 0;
+          }
+          .container {
+            display: none !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          #print-area {
+            display: flex !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white !important;
+            justify-content: center;
+            align-items: center;
+          }
+        }
       `}</style>
-    </div>
+    </>
   );
 }

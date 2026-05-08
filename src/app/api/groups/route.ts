@@ -14,6 +14,7 @@ export async function GET() {
 
     return NextResponse.json(groups);
   } catch (error) {
+    console.error('Erro detalhado na API /api/groups:', error);
     return NextResponse.json({ message: 'Erro ao buscar grupos' }, { status: 500 });
   }
 }

@@ -26,8 +26,16 @@ export default function VotingPage() {
       const response = await fetch('/api/groups');
       const data = await response.json();
       
+      if (!response.ok) {
+        throw new Error(data.message || 'Erro ao carregar grupos do servidor');
+      }
+
+      if (!Array.isArray(data)) {
+        throw new Error('Formato de dados inválido recebido do servidor');
+      }
+
       // Ordenação Numérica (Garante que o Grupo 2 venha antes do Grupo 10)
-      const sortedGroups = data.sort((a: Group, b: Group) => {
+      const sortedGroups = [...data].sort((a: Group, b: Group) => {
         const numA = parseInt(a.name.replace(/\D/g, '')) || 0;
         const numB = parseInt(b.name.replace(/\D/g, '')) || 0;
         return numA - numB;
