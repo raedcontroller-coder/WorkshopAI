@@ -11,7 +11,7 @@ export async function GET() {
         votes: {
           select: { comment: true, timestamp: true },
           where: { 
-            comment: { not: null, not: '' } 
+            comment: { notIn: [null, ''] } 
           },
           orderBy: { timestamp: 'desc' }
         },
