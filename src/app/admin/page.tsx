@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface Group {
   id: string;
@@ -187,6 +188,24 @@ export default function AdminDashboard() {
             >
               {isEditing ? 'Cancelar' : '+ Novo Grupo'}
             </button>
+            <Link href="/admin/dashboard" style={{ textDecoration: 'none' }}>
+              <button 
+                style={{
+                  padding: '0.6rem 1.2rem',
+                  borderRadius: 'var(--radius)',
+                  background: 'rgba(0, 255, 204, 0.1)',
+                  color: 'var(--primary)',
+                  border: '1px solid var(--primary)',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                📊 Dashboard
+              </button>
+            </Link>
             <button 
               onClick={async () => {
                 await fetch('/api/auth/logout', { method: 'POST' });
